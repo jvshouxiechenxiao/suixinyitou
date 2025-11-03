@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>随心一骰</title>
+    <style>
+        body {
+            text-align: center;
+            padding: 50px;
+        }
+        .input-box {
+            margin: 15px 0;
+        }
+        input {
+            width: 150px;
+            padding: 8px;
+            margin-left: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 20px;
+            cursor: pointer;
+        }
+        #result {
+            font-size: 24px;
+            margin-top: 30px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>随心一骰</h1>
+    
+    <div class="input-box">
+        开始数：<input type="number" id="startNum" placeholder="输入开始数字">
+    </div>
+    <div class="input-box">
+        结束数：<input type="number" id="endNum" placeholder="输入结束数字">
+    </div>
+    
+    <button onclick="rollDice()">生成随机数</button>
+    
+    <div id="result">骰出点数：</div>
+
+    <script>
+        function rollDice() {
+            const start = parseInt(document.getElementById('startNum').value);
+            const end = parseInt(document.getElementById('endNum').value);
+            
+            if (isNaN(start) || isNaN(end) || start > end) {
+                document.getElementById('result').textContent = "骰出点数：请输入有效的范围（开始数 ≤ 结束数）";
+                return;
+            }
+            
+            // 生成[start, end]之间的随机整数
+            const randomNum = Math.floor(Math.random() * (end - start + 1)) + start;
+            document.getElementById('result').textContent = `骰出点数：${randomNum}`;
+        }
+    </script>
+</body>
+</html>
