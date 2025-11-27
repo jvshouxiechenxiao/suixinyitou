@@ -3,45 +3,305 @@
 <head>
     <title>随心一骰</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '微软雅黑', 'Helvetica Neue', Arial, sans-serif;
+        }
         body {
             text-align: center;
-            padding: 50px;
+            padding: 30px 10px;
+            background-color: #fff;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: normal;
+            font-size: 24px;
         }
         .input-box {
             margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .input-box label {
+            color: #333;
+            font-size: 16px;
         }
         input {
-            width: 150px;
+            width: 100px;
             padding: 8px;
-            margin-left: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
         }
-        button {
-            padding: 10px 20px;
-            margin: 20px;
+        input:focus {
+            outline: none;
+            border-color: #666;
+        }
+        #generateBtn {
+            padding: 8px 16px;
+            margin: 15px 0;
+            background: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
             cursor: pointer;
         }
+        #generateBtn:hover {
+            background: #f5f5f5;
+        }
         #result {
-            font-size: 24px;
-            margin-top: 30px;
+            font-size: 20px;
+            margin: 15px 0;
             color: #333;
+            min-height: 28px;
+        }
+
+        /* 底部功能按钮区（竖排） */
+        .func-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 20px auto;
+            width: 150px;
+        }
+        .func-btn {
+            padding: 8px 0;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .func-btn:hover {
+            background: #f5f5f5;
+        }
+
+        /* 便捷点数抽屉 */
+        .drawer {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 90;
+        }
+        .drawer-item {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            color: #333;
+            font-size: 14px;
+        }
+        .drawer-item:last-child {
+            border-bottom: none;
+        }
+        .drawer-item:hover {
+            background: #f5f5f5;
+        }
+
+        /* 累加功能面板 */
+        .accumulate-panel {
+            display: none;
+            margin: 10px auto;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 280px;
+        }
+        .accumulate-row {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        #baseNumInput {
+            width: 120px;
+        }
+        #confirmBaseBtn {
+            padding: 4px 8px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #confirmBaseBtn:hover {
+            background: #f5f5f5;
+        }
+
+        /* 历史记录弹窗 */
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .modal-content {
+            background: #fff;
+            width: 90%;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: normal;
+            color: #333;
+        }
+        .close-modal {
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+        .history-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .history-control-btn {
+            padding: 4px 8px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 2px;
+            font-size: 14px;
+        }
+        .history-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 底部标语 */
+        .slogan {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <h1>随心一骰</h1>
-    
-    <div class="input-box">
-        开始数：<input type="number" id="startNum" placeholder="输入开始数字">
+    <div class="container">
+        <h1>随心一骰</h1>
+        
+        <!-- 核心输入区 -->
+        <div class="input-box">
+            <label>开始数：</label>
+            <input type="number" id="startNum" placeholder="输入开始数字">
+        </div>
+        <div class="input-box">
+            <label>结束数：</label>
+            <input type="number" id="endNum" placeholder="输入结束数字">
+        </div>
+
+        <button id="generateBtn" onclick="rollDice()">生成随机数</button>
+        <div id="result">骰出点数：</div>
+
+        <!-- 底部功能按钮（竖排） -->
+        <div class="func-btns">
+            <button class="func-btn" onclick="toggleDrawer()">便捷点数</button>
+            <button class="func-btn" onclick="toggleAccumulatePanel()">累加功能</button>
+            <button class="func-btn" onclick="showHistory()">历史记录</button>
+        </div>
+
+        <!-- 便捷点数抽屉 -->
+        <div class="drawer" id="pointDrawer">
+            <div class="drawer-item" onclick="fillTemplate(1,10)">1d10 (1-10)</div>
+            <div class="drawer-item" onclick="fillTemplate(1,100)">1d100 (1-100)</div>
+            <div class="drawer-item" onclick="fillTemplate(1,2)">1d2 (1-2)</div>
+        </div>
+
+        <!-- 累加功能面板 -->
+        <div class="accumulate-panel" id="accumulatePanel">
+            <div class="accumulate-row">
+                <span>基准数：</span>
+                <input type="text" id="baseNumInput" placeholder="可输加法式子，如10+5" value="0">
+                <button id="confirmBaseBtn" onclick="confirmBaseNum()">确认</button>
+                <span id="baseNumResult">0</span>
+            </div>
+            <div class="accumulate-row">
+                <span>当前累计点数：</span>
+                <span id="currentAccumulate">0</span>
+            </div>
+        </div>
+
+        <!-- 历史记录弹窗 -->
+        <div class="history-modal" id="historyModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>随机数历史记录</h2>
+                    <span class="close-modal" onclick="closeHistory()">&times;</span>
+                </div>
+                <div class="history-controls">
+                    <button class="history-control-btn" onclick="toggleShowIndex()">显示序号：不显示</button>
+                    <button class="history-control-btn" onclick="toggleShowTime()">显示时间：不显示</button>
+                </div>
+                <div class="history-list" id="historyList">暂无记录</div>
+            </div>
+        </div>
+
+        <div class="slogan">
+            给偶然以心灵，而非给心灵以偶然
+        </div>
     </div>
-    <div class="input-box">
-        结束数：<input type="number" id="endNum" placeholder="输入结束数字">
-    </div>
-    
-    <button onclick="rollDice()">生成随机数</button>
-    
-    <div id="result">骰出点数：</div>
 
     <script>
+        // 全局变量
+        let accumulateTotal = 0;      // 累计点数
+        let baseNum = 0;              // 基准数
+        let historyRecords = [];      // 历史记录 [{num: 10, calc: "0+5+5=10", time: Date}]
+        let showIndex = false;        // 是否显示序号（默认不显示）
+        let showTime = 0;             // 0:不显示 1:时分秒 2:年月日
+        let isDrawerOpen = false;     // 抽屉状态
+        let isAccumulatePanelOpen = false; // 累加面板状态
+
+        // 生成随机数核心函数
         function rollDice() {
             const start = parseInt(document.getElementById('startNum').value);
             const end = parseInt(document.getElementById('endNum').value);
@@ -51,13 +311,151 @@
                 return;
             }
             
-            // 生成[start, end]之间的随机整数
+            // 生成[start, end]随机整数
             const randomNum = Math.floor(Math.random() * (end - start + 1)) + start;
             document.getElementById('result').textContent = `骰出点数：${randomNum}`;
+
+            // 累加逻辑：面板打开时累加
+            if (isAccumulatePanelOpen) {
+                accumulateTotal += randomNum;
+                document.getElementById('currentAccumulate').textContent = accumulateTotal;
+                
+                // 记录累加计算过程（格式：基准数+点数+点数……=结果）
+                const lastRecord = historyRecords[historyRecords.length - 1];
+                if (lastRecord && lastRecord.isAccumulate) {
+                    // 拆分原有公式和结果，追加新点数
+                    const [calcPart] = lastRecord.calc.split('=');
+                    lastRecord.calc = `${calcPart}+${randomNum}=${accumulateTotal}`;
+                    lastRecord.num = accumulateTotal;
+                } else {
+                    historyRecords.push({
+                        num: accumulateTotal,
+                        calc: `${baseNum}+${randomNum}=${accumulateTotal}`,
+                        time: new Date(),
+                        isAccumulate: true
+                    });
+                }
+            } else {
+                // 非累加状态：记录单个随机数
+                historyRecords.push({
+                    num: randomNum,
+                    calc: `${randomNum}`,
+                    time: new Date(),
+                    isAccumulate: false
+                });
+            }
         }
+
+        // 模板填充
+        function fillTemplate(s, e) {
+            document.getElementById('startNum').value = s;
+            document.getElementById('endNum').value = e;
+            toggleDrawer(); // 填充后关闭抽屉
+        }
+
+        // 切换便捷点数抽屉
+        function toggleDrawer() {
+            const drawer = document.getElementById('pointDrawer');
+            isDrawerOpen = !isDrawerOpen;
+            drawer.style.display = isDrawerOpen ? 'block' : 'none';
+        }
+
+        // 切换累加面板
+        function toggleAccumulatePanel() {
+            const panel = document.getElementById('accumulatePanel');
+            isAccumulatePanelOpen = !isAccumulatePanelOpen;
+            panel.style.display = isAccumulatePanelOpen ? 'block' : 'none';
+            
+            // 打开时初始化累计值为基准数
+            if (isAccumulatePanelOpen) {
+                accumulateTotal = baseNum;
+                document.getElementById('currentAccumulate').textContent = baseNum;
+            }
+        }
+
+        // 确认基准数
+        function confirmBaseNum() {
+            const baseVal = document.getElementById('baseNumInput').value.trim() || '0';
+            // 过滤非法字符，安全计算
+            try {
+                baseNum = eval(baseVal.replace(/[^0-9\+\-\*\/\(\)\.]/g, ''));
+                document.getElementById('baseNumResult').textContent = baseNum;
+                
+                // 更新累计值为新基准数
+                accumulateTotal = baseNum;
+                document.getElementById('currentAccumulate').textContent = baseNum;
+            } catch (e) {
+                alert('基准数格式错误，请输入有效的数字或加法式子');
+            }
+        }
+
+        // 切换显示序号
+        function toggleShowIndex() {
+            showIndex = !showIndex;
+            const btn = document.querySelectorAll('.history-control-btn')[0];
+            btn.textContent = `显示序号：${showIndex ? '显示' : '不显示'}`;
+            renderHistory();
+        }
+
+        // 切换显示时间
+        function toggleShowTime() {
+            showTime = (showTime + 1) % 3;
+            const btn = document.querySelectorAll('.history-control-btn')[1];
+            const timeText = ['不显示', '只显示时分秒', '显示年月日'];
+            btn.textContent = `显示时间：${timeText[showTime]}`;
+            renderHistory();
+        }
+
+        // 格式化时间
+        function formatTime(date) {
+            if (showTime === 0) return '';
+            if (showTime === 1) {
+                return date.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            }
+            return date.toLocaleString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        }
+
+        // 渲染历史记录
+        function renderHistory() {
+            const listDom = document.getElementById('historyList');
+            if (historyRecords.length === 0) {
+                listDom.innerHTML = "<div class='history-item'>暂无记录</div>";
+                return;
+            }
+
+            listDom.innerHTML = historyRecords.map((item, idx) => {
+                const index = showIndex ? `${idx + 1}. ` : '';
+                const time = formatTime(item.time);
+                const timeStr = time ? ` ｜ ${time}` : '';
+                return `<div class="history-item">${index}${item.calc}${timeStr}</div>`;
+            }).join('');
+        }
+
+        // 显示历史记录弹窗
+        function showHistory() {
+            renderHistory();
+            document.getElementById('historyModal').style.display = "block";
+        }
+
+        // 关闭历史记录弹窗
+        function closeHistory() {
+            document.getElementById('historyModal').style.display = "none";
+        }
+
+        // 点击弹窗外部关闭
+        window.onclick = function(e) {
+            const modal = document.getElementById('historyModal');
+            if (e.target === modal) closeHistory();
+        }
+
+        // 点击页面空白处关闭抽屉
+        document.addEventListener('click', function(e) {
+            const drawer = document.getElementById('pointDrawer');
+            const funcBtn = document.querySelectorAll('.func-btn')[0];
+            if (isDrawerOpen && !drawer.contains(e.target) && e.target !== funcBtn) {
+                toggleDrawer();
+            }
+        });
     </script>
-    <div style="text-align: center; margin-top: 20px; font-family: '微软雅黑', 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #666;">
-  给偶然以心灵，而非给心灵以偶然
-    </div>
 </body>
 </html>
